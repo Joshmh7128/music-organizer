@@ -9,57 +9,67 @@ lrel = 'D:/Media Server/Music/'
 rel = lrel # directory to work with
 print(rel)
 
-def organize(d):
-    if "." in d and ".py" not in d:
-            tag = TinyTag.get(d)
+def organize():
+    for d in listdir:
+        if validType(d):
+                tag = TinyTag.get(d)
 
-            # album strange character handling
-            taralb = tag.album
+                # album strange character handling
+                taralb = tag.album
 
-            if taralb != None and ':' in taralb:
-                taralb = taralb.replace(':','-')
-            
-            if taralb != None and '&' in taralb:
-                taralb = taralb.replace('&','and')
+                if taralb != None and ':' in taralb:
+                    taralb = taralb.replace(':','-')
+                
+                if taralb != None and '&' in taralb:
+                    taralb = taralb.replace('&','and')
 
-            if taralb != None and '/' in taralb:
-                taralb = taralb.replace('/','-')
+                if taralb != None and '/' in taralb:
+                    taralb = taralb.replace('/','-')
 
-            if taralb != None and '”' in taralb:
-                taralb = taralb.replace('”',' ')
+                if taralb != None and '”' in taralb:
+                    taralb = taralb.replace('”',' ')
 
-            if taralb != None and '“' in taralb:
-                taralb = taralb.replace('“',' ')
+                if taralb != None and '“' in taralb:
+                    taralb = taralb.replace('“',' ')
 
-            if taralb != None and '"' in taralb:
-                taralb = taralb.replace('"',' ')
+                if taralb != None and '"' in taralb:
+                    taralb = taralb.replace('"',' ')
 
-            # artist strange character handling
-            tarart = tag.artist
+                # artist strange character handling
+                tarart = tag.artist
 
-            if tarart != None and':' in tarart:
-                tarart = tarart.replace(':','-')
+                if tarart != None and':' in tarart:
+                    tarart = tarart.replace(':','-')
+                    
+                if tarart != None and'/' in tarart:
+                    tarart = tarart.replace('/','-')
+                
+                if tarart != None and';' in tarart:
+                    tarart = tarart.replace(';','-')
 
-            if tarart != None and '&' in tarart:
-                tarart = tarart.replace('&','and')
+                if tarart != None and '&' in tarart:
+                    tarart = tarart.replace('&','and')
 
-            if (tarart == None):
-                tarart = ''
+                if tarart != None and'*' in tarart:
+                    tarart = tarart.replace('*','-')
 
-            if (taralb == None):
-                taralb = ''
+                if (tarart == None):
+                    tarart = ''
 
-            print(taralb + " | " + tarart)
+                if (taralb == None):
+                    taralb = ''
 
-            tarpath = rel + tarart + "/" + taralb + "/"
+                print(taralb + " | " + tarart)
 
-            if os.path.exists(tarpath) == False:
-                print("making new directory: " + tarpath)
-                # check the path to the arist
-                if (os.path.exists(rel + tarart) == False):
-                    os.mkdir(rel + tarart)
-                os.mkdir(tarpath)
-            shutil.move(rel + d, tarpath)
+                tarpath = rel + tarart + "/" + taralb + "/"
+
+                if os.path.exists(tarpath) == False:
+                    print("making new directory: " + tarpath)
+                    # check the path to the arist
+                    if (os.path.exists(rel + tarart) == False):
+                        os.mkdir(rel + tarart)
+                    os.mkdir(tarpath)
+                shutil.move(rel + d, tarpath)
 
 # opens a directory and scans files
 def openDir(d):
@@ -74,9 +84,14 @@ def openDir(d):
 def validType(d):
     return TinyTag.is_supported(d)
 
+
+lqsongs = []
+
 def checkFile(d):
     if (os.path.isfile(d) & validType(d)):
         tag = TinyTag.get(d)
+        if (tag.bitrate == None): 
+            return
         if (tag.bitrate < 200): 
             ar = tag.artist or "NONE"
             al = tag.album or "NONE"
@@ -84,22 +99,25 @@ def checkFile(d):
             lqsongs.append(ar +  " | " + al + " | " + ti + " | " + str(int(tag.bitrate)))
             return
 
-lqsongs = []
-# checks songs for low quality
-for x in listdir:
-    # do we have a directory?
-    if os.path.isdir(x):
-        openDir(rel + x)
+def makeReport():
+    # checks songs for low quality
+    for x in listdir:
+        # do we have a directory?
+        if os.path.isdir(x):
+            openDir(rel + x)
 
-f = open(rel + "report.txt", "w")
-f.write("")
-f.close()
+    f = open(rel + "report.txt", "w")
+    f.write("")
+    f.close()
 
-f = open(rel + "report.txt", "a")
-f.write("~~~~~~~~ Low Quality Song Report: ~~~~~~~~" + "\n")
-for x in lqsongs:
-    z = str(x.encode('utf-8'))
-    f.write(z + "\n")
-f.close()
+    f = open(rel + "report.txt", "a")
+    f.write("~~~~~~~~ Low Quality Song Report: ~~~~~~~~" + "\n")
+    for x in lqsongs:
+        z = str(x.encode('utf-8'))
+        f.write(z + "\n")
+    f.close()
 
         
+# run here
+organize()
+# makeReport()
